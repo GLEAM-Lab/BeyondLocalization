@@ -94,6 +94,20 @@ The 42 tasks shared by the 2 screened sets reuse their Lite responses in the Ver
 Response headers and runtime state files are not included.
 In agent trajectories, the cluster account and project names are replaced by `user` and `project`.
 
+## Settings and accounting
+
+These details complement the paper.
+
+- DeepSeek Flash is the vendor service `deepseek-flash`, documented as DeepSeek-V4.1-Flash-1017 and accessed in October 2026 with temperature 0, top-p 1, thinking disabled, and a 393,216-token output limit.
+- Qwen3-Coder-30B-A3B-Instruct runs at revision `b2cff646` in BF16 through vLLM. GLM-4.5-Air runs in BF16 through vLLM with 4-way tensor parallelism and its thinking mode disabled. Both use temperature 0, top-p 1, top-k -1, a repetition penalty of 1.0, an 8,192-token output limit, and seed 20261025.
+- The candidate experiment has 3,021 response slots: 905 Lite and 464 Verified slots for DeepSeek, and 362 Lite and 464 Verified slots each for Qwen and GLM. The Verified slots cover the 232 Verified tasks outside the screened Lite set. 6 DeepSeek requests returned no response, and 3 test runs of Qwen and GLM reached the test limit without a report. These 9 slots have an empty `resolved` value and stage `no_response` or `test_timeout`.
+- A function is identified by its repository-relative path, qualified name, and pre-patch start line. Candidate sets exclude duplicate, overlapping, and containing source ranges. Patches whose mapping to functions is ambiguous at a boundary have empty edit columns.
+- The native-candidate experiment has 543 task-condition cells and 417 generated responses, because condition B reuses condition A's response on the 126 tasks whose native candidates already cover the developer-modified functions. A single condition A test run reached the test limit and counts as unresolved.
+- Official evaluation uses SWE-bench harness commit `726c5461e2ef52d83cf1ea2107870a8bb3328d57` with 1 CPU, 6 GiB of memory, a 600-second test limit, and a 750-second process limit.
+- The 3 Verified identity views cover all 274 tasks, the 232 tasks outside the screened Lite set, and the 222 tasks outside the 300-task Lite split. Lite has 65, 6, and 110 tasks whose issue names all, some, or none of the developer-modified functions, and Verified has 119, 12, and 143.
+- The failure codebook was fixed after a 20-response pilot. On 100 control responses, the labeler agrees with the automated facts on 100, 92, and 98 answers about whether the patch edits the developer-modified functions, whether its target tests pass, and whether the response names these functions before its first edit.
+- Wrong-evidence controls longer than their informative prompt are truncated at the tail to the matched token budget.
+
 ## Repair systems
 
 The modified Agentless, KGCompass, and ExpeRepair pipelines and their original runs for the system experiments are archived on Zenodo at <https://doi.org/10.5281/zenodo.19232375>.

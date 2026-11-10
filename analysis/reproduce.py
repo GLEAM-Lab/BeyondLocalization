@@ -13,7 +13,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import DATA, LLM_NAMES, boolean, candidate, outcome, read, task_sets, tasks, view_rows  # noqa: E402
-from stats import bootstrap_ci_multinomial, holm, paired  # noqa: E402
+from stats import bootstrap_ci_multinomial, holm, mcnemar, paired  # noqa: E402
 
 SYSTEMS = ('Agentless', 'KGCompass', 'ExpeRepair')
 ORACLE_POOLS = {'Agentless': 'Agentless-best-patch', 'KGCompass': 'KGCompass-best-patch', 'ExpeRepair': 'ExpeRepair-v1.0-best-patch'}
@@ -328,6 +328,28 @@ def tab_evidence():
         print(f'  {r["wrapper"]} {r["condition"]}: added {float(r["solved_at_k_percent"]):.1f}, filler {float(r["exact_filler_solved_at_k_percent"]):.1f} '
               f'(Holm p {r["exact_filler_holm_family"]}), wrong {float(r["hard_negative_solved_at_k_percent"]):.1f} '
               f'(Holm p {r["hard_negative_holm_family"]}), prompt tokens {float(r["mean_prompt_ktokens"]):.2f}k')
+
+    print('Filler and wrong-evidence controls on the 300 Lite tasks and on the 181 screened tasks (Holm over the 6 conditions of each control)')
+    cond_pool = {'agentless_kg': 'Agentless-agentless-kg', 'agentless_expe': 'Agentless-agentless-expe', 'agentless_union': 'Agentless-unionprompt',
+                 'experepair_kg': 'ExpeRepair-experepair-kg', 'experepair_agentless': 'ExpeRepair-experepair-agentless', 'experepair_union': 'ExpeRepair-unionprompt'}
+    ctrl_pool = {'agentless_kg': 'Agentless-agentless-kg', 'agentless_expe': 'Agentless-agentless-expe', 'agentless_union': 'Agentless-agentless-union',
+                 'experepair_kg': 'ExpeRepair-experepair-kg', 'experepair_agentless': 'ExpeRepair-experepair-agentless', 'experepair_union': 'ExpeRepair-experepair-union'}
+    rows = read('system/evidence_controls.csv')
+    screened = set(task_sets()['lite'])
+    for label_, keep in (('300 Lite tasks', None), ('181 screened tasks', screened)):
+        print(f'  {label_}')
+        for kind, suffix in (('filler', 'exact-filler'), ('wrong evidence', 'irrelevant-hn')):
+            stats = []
+            for r in rows:
+                cond = frequencies(cond_pool[r['condition_key']])
+                ctrl = frequencies(ctrl_pool[r['condition_key']] + '-' + suffix)
+                ids = [i for i in cond if keep is None or i in keep]
+                wins = sum(cond[i] > 0 and ctrl[i] == 0 for i in ids)
+                losses = sum(cond[i] == 0 and ctrl[i] > 0 for i in ids)
+                stats.append((r, 100 * sum(cond[i] > 0 for i in ids) / len(ids), 100 * sum(ctrl[i] > 0 for i in ids) / len(ids), wins, losses))
+            adjusted = holm([mcnemar(w, l) for _, _, _, w, l in stats])
+            for (r, c, f, w, l), a in zip(stats, adjusted):
+                print(f'    {kind}, {r["wrapper"]} {r["condition"]}: added {c:.1f}, control {f:.1f}, added-only {w}, control-only {l}, Holm p {a:.2g}')
     print('Tables tab-evidence-split-budget, tab-evidence-trajectory, and tab-rq4-win-frontier-gap')
     native = {s: frequencies(ORACLE_POOLS[s]) for s in SYSTEMS}
     union = {i for s in SYSTEMS for i, v in native[s].items() if v > 0}
@@ -350,6 +372,78 @@ def tab_evidence():
                   f'frontier {len(frontier)} ({100 * len(frontier) / len(wins):.1f}%)')
     reached = {i for (s, ctx), name in EVIDENCE_POOLS.items() for i, v in frequencies(name).items() if v > 0 and i not in union}
     print(f'  tasks with no recorded success in the 3 Oracle pools: {300 - len(union)}; reached by any added evidence: {len(reached)}')
+
+
+def _pair_line(label, u, k):
+    r = paired(u, k)
+    return f'  {label}: pairs {r["pairs"]}, known-only {r["b_only"]}, unknown-only {r["a_only"]}, diff {r["diff_pp"]:+.1f} pp, p {r["p"]:.3f}'
+
+
+def _rows(path, **keys):
+    return [r for r in read(path) if all(r[k] == v for k, v in keys.items())]
+
+
+def tab_robustness():
+    print('Robustness checks: bounded DeepSeek output (R1), repeated Qwen sampling (R2), and prompt variants (R3)')
+    print('R1: DeepSeek Lite, max_tokens 8192, known minus unknown')
+    r1 = read('robustness/r1_deepseek_bounded.csv')
+    for m in ('10', '20'):
+        sub = [r for r in r1 if r['m'] == m]
+        u = {r['instance_id']: boolean(r['resolved']) for r in sub if r['condition'] == 'unknown'}
+        k = {r['instance_id']: boolean(r['resolved']) for r in sub if r['condition'] == 'known'}
+        touch = {c: sum(r['touch_g'] == '1' for r in sub if r['condition'] == c) for c in ('unknown', 'known')}
+        length = {c: sum(r['finish_reason'] == 'length' for r in sub if r['condition'] == c) for c in ('unknown', 'known')}
+        print(_pair_line(f'm={m}', u, k) + f'; touch G unknown {touch["unknown"]} known {touch["known"]}; length unknown {length["unknown"]} known {length["known"]}')
+    print('R2: Qwen, 60 Lite tasks, m=20; repeat 0 is the original temperature-0 response, repeats 1 to 4 sample at temperature 0.2')
+    r2 = read('robustness/r2_qwen_repeats.csv')
+    ids = sorted({r['instance_id'] for r in r2})
+    base = {(r['instance_id'], r['condition']): boolean(r['resolved']) for r in read('candidate/responses.csv')
+            if r['llm'] == 'qwen' and r['cohort'] == 'C1' and r['m'] == '20' and r['instance_id'] in ids}
+    print(_pair_line('repeat 0', {i: base.get((i, 'unknown')) for i in ids}, {i: base.get((i, 'known')) for i in ids}))
+    for rep in sorted({r['repeat'] for r in r2}):
+        sub = [r for r in r2 if r['repeat'] == rep]
+        u = {r['instance_id']: boolean(r['resolved']) for r in sub if r['condition'] == 'unknown'}
+        k = {r['instance_id']: boolean(r['resolved']) for r in sub if r['condition'] == 'known'}
+        print(_pair_line(f'repeat {rep}', u, k) + f'; solved unknown {sum(v is True for v in u.values())} known {sum(v is True for v in k.values())}')
+    print('R3: Lite 181 tasks, m=20; variants a (location sentence), b (function list), c (neutral sentence) against the existing prompts')
+    r3 = read('robustness/r3_variants.csv')
+    for llm in ('qwen', 'glm'):
+        old = {(r['instance_id'], r['condition']): r for r in read('candidate/responses.csv')
+               if r['llm'] == llm and r['cohort'] == 'C1' and r['m'] == '20'}
+        tid = sorted({i for i, _ in old})
+        print(f'  {LLM_NAMES[llm]} existing prompts: touch G unknown {sum(old[(i, "unknown")]["touch_g"] == "1" for i in tid)} '
+              f'known {sum(old[(i, "known")]["touch_g"] == "1" for i in tid)} of {len(tid)}')
+        for v in 'abc':
+            sub = {r['instance_id']: r for r in r3 if r['llm'] == llm and r['condition'] == v}
+            res = {i: boolean(sub[i]['resolved']) for i in tid if i in sub}
+            for ref in ('unknown', 'known'):
+                rr = {i: boolean(old[(i, ref)]['resolved']) for i in tid}
+                print(_pair_line(f'{LLM_NAMES[llm]} variant {v} minus {ref}', rr, res)
+                      + (f'; touch G {sum(r["touch_g"] == "1" for r in sub.values())} of {len(sub)}' if ref == 'unknown' else ''))
+
+
+def tab_statement_overlap():
+    print('Statement-level overlap of the final patches in known/unknown pairs that differ in outcome and edit the same developer-modified functions')
+    rows = read('candidate/statement_overlap.csv')
+    views = []
+    for r in rows:
+        key = (r['llm'], r['view'], int(r['m']))
+        if key not in views:
+            views.append(key)
+
+    def line(label, sub):
+        c = collections.Counter(r['category'] for r in sub)
+        win = [r['known_hits_dev' if r['winner'] == 'known' else 'unknown_hits_dev'] for r in sub]
+        lose = [r['unknown_hits_dev' if r['winner'] == 'known' else 'known_hits_dev'] for r in sub]
+        win, lose = [x for x in win if x], [x for x in lose if x]
+        print(f'  {label}: pairs {len(sub)}, same statements {c["same"]}, overlapping {c["overlap"]}, disjoint {c["disjoint"]}, unmapped {c["unmapped"]}; '
+              f'winner hits a developer statement {win.count("1")} of {len(win)}, loser {lose.count("1")} of {len(lose)}')
+    for key in sorted(views, key=lambda k: VIEWS.index(k) if k in VIEWS else 99):
+        line(label(*key), [r for r in rows if (r['llm'], r['view'], int(r['m'])) == key])
+    disjoint = [r for r in rows if r['view'] != 'verified']
+    line('pooled over the non-overlapping views (Lite and non-Lite)', disjoint)
+    same = [r for r in disjoint if r['category'] == 'same']
+    print(f'  among {len(same)} pairs with the same statements, the 2 patches are identical in {sum(r["identical_patch"] == "1" for r in same)} pairs; all others differ in the code written there')
 
 
 def tab_output_tail():
@@ -376,7 +470,7 @@ TABLES = {'candidate-outcomes': tab_candidate_outcomes, 'count-contrasts': tab_c
           'loop-counts': tab_loop_counts, 'stage-transitions': tab_stage_transitions, 'reference-success': tab_reference_success,
           'discordant-sets': tab_discordant_sets, 'candidate-composition': tab_candidate_composition, 'issue-strata': tab_issue_strata,
           'native-candidates': tab_native_candidates, 'agent': tab_agent, 'oracle-main': tab_oracle_main, 'samples': tab_samples,
-          'shared-prompt': tab_shared_prompt, 'evidence': tab_evidence, 'output-tail': tab_output_tail, 'failure-causes': tab_failure_causes}
+          'shared-prompt': tab_shared_prompt, 'evidence': tab_evidence, 'robustness': tab_robustness, 'statement-overlap': tab_statement_overlap, 'output-tail': tab_output_tail, 'failure-causes': tab_failure_causes}
 
 if __name__ == '__main__':
     for name in sys.argv[1:] or TABLES:

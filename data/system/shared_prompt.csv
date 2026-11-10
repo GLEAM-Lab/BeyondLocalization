@@ -1,0 +1,4 @@
+system,native_k,shared_wrapper_k,shared_builder_available,cross_wrapper_k_aligned,A_native_wrapper_native_loc_percent,B_native_wrapper_oracle_loc_percent,C_shared_wrapper_native_loc_percent,D_shared_wrapper_oracle_loc_percent,E_shared_builder_oracle_shared_wrapper_percent,delta_B_minus_A_points,delta_D_minus_C_points,delta_E_minus_C_points,delta_D_minus_E_points,delta_B_minus_D_points,delta_C_minus_A_points
+Agentless,1,10,True,False,28.0,40.333333333333336,35.666666666666664,37.0,51.0,12.333333333333336,1.3333333333333357,15.333333333333336,-14.0,,
+KGCompass,1,10,True,False,29.333333333333332,43.0,17.0,50.333333333333336,51.0,13.666666666666668,33.333333333333336,34.0,-0.6666666666666643,,
+ExpeRepair,1,10,True,False,35.507246376811594,39.66101694915254,40.333333333333336,51.333333333333336,51.0,4.153770572340946,11.0,10.666666666666664,0.3333333333333357,,

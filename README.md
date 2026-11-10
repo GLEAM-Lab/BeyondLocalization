@@ -50,6 +50,7 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Tables 18 to 20 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
 | Table 21 | `output-tail` | `data/candidate/responses.csv` |
 | Table 22 | `failure-causes` | `data/failure_labels.csv` |
+| Screened Lite 181 rows of Tables 14, 15, 17, and 19, and the 181-task counts of RQ4 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
 | Figure 3 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
 
 The script also prints analyses that the paper does not tabulate: repetition-loop counts per condition with `loop-counts`, the shared-prompt comparison with `shared-prompt`, and the all-sample success counts within `evidence`.

@@ -55,7 +55,7 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Figure 3 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
 | Robustness runs in Threats to Validity | `robustness` | `data/robustness/` |
 
-Table 1 lists the experiment settings, Table 20 compares related studies, and Figures 1 and 4 are illustrations.
+Table 1 lists the experiment settings, and Figures 1 and 4 are illustrations.
 
 The script also prints analyses that the paper does not tabulate: repetition-loop counts with `loop-counts`, stage transitions with `stage-transitions`, the shared-prompt comparison with `shared-prompt`, DeepSeek completion reasons with `output-tail`, and the split-budget and all-sample counts within `evidence`.
 

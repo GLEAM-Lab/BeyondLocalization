@@ -102,7 +102,7 @@ def tab_identity_effects():
 
 
 def tab_loop_counts():
-    print('Table tab-loop-counts: DeepSeek responses that end at the length limit')
+    print('Repetition loops (not tabulated in the paper): DeepSeek responses that end at the length limit')
     for view, m in (('lite', 10), ('lite', 20), ('other232', 20)):
         p = pairs('deepseek', view, m)
         loops = {c: sum(1 for u, k in p.values() if (u if c == 0 else k) and (u if c == 0 else k)['finish_reason'] == 'length') for c in (0, 1)}
@@ -112,7 +112,7 @@ def tab_loop_counts():
 
 
 def tab_stage_transitions():
-    print('Table tab-stage-transitions: wins split by whether the losing response reached the tests')
+    print('Stage transitions (not tabulated in the paper): wins split by whether the losing response reached the tests')
     for llm, view, m in VIEWS:
         st = collections.Counter()
         complete = 0
@@ -316,7 +316,7 @@ def tab_samples():
 
 
 def tab_shared_prompt():
-    print('Table tab-oracle-common-wrapper: shared-prompt Solved@10 counts')
+    print('Shared-prompt Solved@10 counts (not tabulated in the paper)')
     for r in read('system/shared_prompt.csv'):
         print(f'  {r["system"]}: native {round(3 * float(r["C_shared_wrapper_native_loc_percent"]))}, '
               f'oracle {round(3 * float(r["D_shared_wrapper_oracle_loc_percent"]))}, shared builder {round(3 * float(r["E_shared_builder_oracle_shared_wrapper_percent"]))}')
@@ -350,7 +350,7 @@ def tab_evidence():
             adjusted = holm([mcnemar(w, l) for _, _, _, w, l in stats])
             for (r, c, f, w, l), a in zip(stats, adjusted):
                 print(f'    {kind}, {r["wrapper"]} {r["condition"]}: added {c:.1f}, control {f:.1f}, added-only {w}, control-only {l}, Holm p {a:.2g}')
-    print('Tables tab-evidence-split-budget, tab-evidence-trajectory, and tab-rq4-win-frontier-gap')
+    print('Table tab-rq4-win-frontier-gap, with the split-budget and all-sample counts')
     native = {s: frequencies(ORACLE_POOLS[s]) for s in SYSTEMS}
     union = {i for s in SYSTEMS for i, v in native[s].items() if v > 0}
     for s, (x, y) in (('Agentless', ('KGCompass', 'ExpeRepair')), ('ExpeRepair', ('KGCompass', 'Agentless'))):
@@ -447,7 +447,7 @@ def tab_statement_overlap():
 
 
 def tab_output_tail():
-    print('Table tab-output-tail: DeepSeek completion reasons')
+    print('DeepSeek completion reasons (not tabulated in the paper)')
     rows = [r for r in ROWS.values() if r['llm'] == 'deepseek' and r['finish_reason']]
     for reason in ('stop', 'length'):
         sub = [r for r in rows if r['finish_reason'] == reason]

@@ -41,22 +41,23 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Table 2 | `candidate-outcomes` | `data/candidate/responses.csv` |
 | Table 3 | `count-contrasts` | `data/candidate/responses.csv` |
 | Table 4 and the Holm families | `identity-effects` | `data/candidate/responses.csv` |
-| Table 5 | `stage-transitions` | `data/candidate/responses.csv` |
-| Table 6 and Figure 2 | `reference-success`, `figures.py` | `data/candidate/responses.csv` |
-| Table 7 | `discordant-sets` | `data/candidate/responses.csv` |
-| Table 8 | `candidate-composition` | `data/candidate/responses.csv`, `data/candidate/composition.csv` |
-| Table 9 | `issue-strata` | `data/candidate/responses.csv`, `data/tasks.csv` |
-| Tables 10 and 11 | `native-candidates` | `data/native/responses.csv` |
-| Tables 12 and 13 | `agent` | `data/agent/runs.csv` |
-| Tables 14 and 15 | `oracle-main` | `data/system/final_predictions.csv` |
-| Tables 16 and 17 | `samples` | `data/system/sample_frequencies/`, `data/system/final_predictions.csv` |
-| Tables 18 to 20 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
-| Table 21 | `output-tail` | `data/candidate/responses.csv` |
-| Table 22 | `failure-causes` | `data/failure_labels.csv` |
-| Screened Lite 181 rows of Tables 14, 15, 17, and 19, and the 181-task counts of RQ4 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
+| Table 5 and Figure 2 | `reference-success`, `figures.py` | `data/candidate/responses.csv` |
+| Table 6 | `discordant-sets`, `statement-overlap` | `data/candidate/responses.csv`, `data/candidate/statement_overlap.csv` |
+| Table 7 | `candidate-composition` | `data/candidate/responses.csv`, `data/candidate/composition.csv` |
+| Table 8 | `issue-strata` | `data/candidate/responses.csv`, `data/tasks.csv` |
+| Tables 9 and 10 | `native-candidates` | `data/native/responses.csv` |
+| Tables 11 and 12 | `agent` | `data/agent/runs.csv` |
+| Tables 13 and 14 | `oracle-main` | `data/system/final_predictions.csv` |
+| Tables 15 and 16 | `samples` | `data/system/sample_frequencies/`, `data/system/final_predictions.csv` |
+| Tables 17 and 18, and the control comparisons of RQ3 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
+| Table 19 | `failure-causes` | `data/failure_labels.csv` |
+| Screened Lite 181 rows of Tables 13, 14, 16, and 17, and the 181-task counts of RQ4 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
 | Figure 3 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
+| Robustness runs in Threats to Validity | `robustness` | `data/robustness/` |
 
-The script also prints analyses that the paper does not tabulate: repetition-loop counts per condition with `loop-counts`, the shared-prompt comparison with `shared-prompt`, and the all-sample success counts within `evidence`.
+Table 1 lists the experiment settings, Table 20 compares related studies, and Figures 1 and 4 are illustrations.
+
+The script also prints analyses that the paper does not tabulate: repetition-loop counts with `loop-counts`, stage transitions with `stage-transitions`, the shared-prompt comparison with `shared-prompt`, DeepSeek completion reasons with `output-tail`, and the split-budget and all-sample counts within `evidence`.
 
 Paired comparisons use exact two-sided McNemar tests and percentile 95% task-bootstrap intervals with 10,000 replicates and seed 20261024, as implemented in `analysis/stats.py`.
 

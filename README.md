@@ -16,7 +16,7 @@ pip install -r requirements.txt
 python analysis/reproduce.py              # all tables
 python analysis/reproduce.py identity-effects agent   # selected tables
 python analysis/reproduce.py robustness statement-overlap
-python analysis/figures.py                # Figures 2 and 3 into figures/
+python analysis/figures.py                # Figures 3 and 4 into figures/
 ```
 
 The raw archives are stored with Git LFS.
@@ -41,7 +41,7 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Table 2 | `candidate-outcomes` | `data/candidate/responses.csv` |
 | Table 3 | `count-contrasts` | `data/candidate/responses.csv` |
 | Table 4 and the Holm families | `identity-effects` | `data/candidate/responses.csv` |
-| Table 5 and Figure 2 | `reference-success`, `figures.py` | `data/candidate/responses.csv` |
+| Table 5 and Figure 3 | `reference-success`, `figures.py` | `data/candidate/responses.csv` |
 | Table 6 | `discordant-sets`, `statement-overlap` | `data/candidate/responses.csv`, `data/candidate/statement_overlap.csv` |
 | Table 7 | `candidate-composition` | `data/candidate/responses.csv`, `data/candidate/composition.csv` |
 | Table 8 | `issue-strata` | `data/candidate/responses.csv`, `data/tasks.csv` |
@@ -52,10 +52,10 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Tables 17 and 18, and the control comparisons of RQ3 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
 | Table 19 | `failure-causes` | `data/failure_labels.csv` |
 | Screened Lite 181 rows of Tables 13, 14, 16, and 17, and the 181-task counts of RQ4 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
-| Figure 3 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
+| Figure 4 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
 | Robustness runs in Threats to Validity | `robustness` | `data/robustness/` |
 
-Table 1 lists the experiment settings, and Figures 1 and 4 are illustrations.
+Table 1 lists the experiment settings, and Figures 1, 2, and 5 are illustrations.
 
 The script also prints analyses that the paper does not tabulate: repetition-loop counts with `loop-counts`, stage transitions with `stage-transitions`, the shared-prompt comparison with `shared-prompt`, DeepSeek completion reasons with `output-tail`, and the split-budget and all-sample counts within `evidence`.
 

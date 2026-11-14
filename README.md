@@ -48,10 +48,10 @@ Clone with Git LFS installed, or run `git lfs pull` after cloning, to fetch them
 | Tables 9 and 10 | `native-candidates` | `data/native/responses.csv` |
 | Tables 11 and 12 | `agent` | `data/agent/runs.csv` |
 | Tables 13 and 14 | `oracle-main` | `data/system/final_predictions.csv` |
-| Tables 15 and 16 | `samples` | `data/system/sample_frequencies/`, `data/system/final_predictions.csv` |
-| Tables 17 and 18, and the control comparisons of RQ3 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
+| Tables 15 and 16, and the control comparisons of RQ3 | `evidence` | `data/system/evidence_controls.csv`, `data/system/sample_frequencies/` |
+| Tables 17 and 18 | `samples` | `data/system/sample_frequencies/`, `data/system/final_predictions.csv` |
 | Table 19 | `failure-causes` | `data/failure_labels.csv` |
-| Screened Lite 181 rows of Tables 13, 14, 16, and 17, and the 181-task counts of RQ4 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
+| Screened Lite 181 rows of Tables 13, 14, 15, and 18, and the 181-task counts of RQ3 | `screened_subset.py` | `data/system/`, `data/tasks.csv` |
 | Figure 4 | `figures.py` | `data/system/final_predictions.csv`, `data/system/sample_frequencies/` |
 | Robustness runs in Threats to Validity | `robustness` | `data/robustness/` |
 

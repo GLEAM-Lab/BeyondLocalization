@@ -350,7 +350,7 @@ def tab_evidence():
             adjusted = holm([mcnemar(w, l) for _, _, _, w, l in stats])
             for (r, c, f, w, l), a in zip(stats, adjusted):
                 print(f'    {kind}, {r["wrapper"]} {r["condition"]}: added {c:.1f}, control {f:.1f}, added-only {w}, control-only {l}, Holm p {a:.2g}')
-    print('Table tab-rq4-win-frontier-gap, with the split-budget and all-sample counts')
+    print('Table tab-evidence-reach, with the split-budget and all-sample counts')
     native = {s: frequencies(ORACLE_POOLS[s]) for s in SYSTEMS}
     union = {i for s in SYSTEMS for i, v in native[s].items() if v > 0}
     for s, (x, y) in (('Agentless', ('KGCompass', 'ExpeRepair')), ('ExpeRepair', ('KGCompass', 'Agentless'))):
